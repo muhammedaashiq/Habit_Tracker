@@ -1,40 +1,48 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+
 import API from "../services/api";
+import Sidebar from "../components/Sidebar";
+import Topbar from "../components/Topbar";
+import StatsCards from "../components/StatsCards";
+import ContributionGraph from "../components/ContributionGraph";
+import HabitCard from "../components/HabitCard";
+// import AddHabit from "../components/AddHabit";
 
 const Dashboard = () => {
     const [habits, setHabits] = useState([]);
     const [title, setTitle] = useState("");
     const [description, setDescription] = useState("");
+    const [darkMode, setDarkMode] = useState(() => {
+        return localStorage.getItem("theme") !== "light";
+    });
+
+    const navigate = useNavigate();
 
     // Add Habit
 
-    const addHabit = async (e) => {
-        e.preventDefault();
+    // const addHabit = async (title, description) => {
+    //     try {
+    //         const token = localStorage.getItem("token");
 
-        try {
-            const token = localStorage.getItem("token");
+    //         const res = await API.post(
+    //             "/habits",
+    //             {
+    //                 title,
+    //                 description,
+    //             },
+    //             {
+    //                 headers: {
+    //                     Authorization: `Bearer ${token}`,
+    //                 },
+    //             }
+    //         );
 
-            const res = await API.post(
-                "/habits",
-                {
-                    title,
-                    description,
-                },
-                {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                }
-            );
-
-            setHabits([...habits, res.data]);
-
-            setTitle("");
-            setDescription("");
-        } catch (error) {
-            console.log(error);
-        }
-    };
+    //         setHabits([res.data, ...habits]);
+    //     } catch (error) {
+    //         console.log(error);
+    //     }
+    // };
 
     // COMPLETE HABITS
 
@@ -101,65 +109,56 @@ const Dashboard = () => {
         }
     };
 
+    //LOGOUT
+
+    const logout = () => {
+        localStorage.removeItem("token");
+
+        navigate("/");
+    };
+
     useEffect(() => {
         fetchHabits();
     }, []);
 
+    useEffect(() => {
+        if (darkMode) {
+            document.documentElement.classList.add("dark");
+            localStorage.setItem("theme", "dark");
+        } else {
+            document.documentElement.classList.remove("dark");
+            localStorage.setItem("theme", "light");
+        }
+    }, [darkMode]);
+
     return (
-        <div style={{ padding: "40px" }}>
-            <h1>Habit Dashboard</h1>
+        <div className="md:flex bg-black min-h-screen">
+            <Sidebar />
 
-            <form onSubmit={addHabit}>
-                <input
-                    type="text"
-                    placeholder="Habit title"
-                    value={title}
-                    onChange={(e) => setTitle(e.target.value)}
+            <div className="flex-1 md:p-8">
+                <Topbar
+                    darkMode={darkMode}
+                    setDarkMode={setDarkMode}
                 />
 
-                <br />
-                <br />
+                <StatsCards habits={habits}/>
 
-                <input
-                    type="text"
-                    placeholder="Description"
-                    value={description}
-                    onChange={(e) => setDescription(e.target.value)}
-                />
+                {/* <AddHabit addHabit={addHabit} /> */}
 
-                <br />
-                <br />
+                <ContributionGraph habits={habits} />
 
-                <button type="submit">Add Habit</button>
-            </form>
-
-            <br />
-            <hr />
-            <br />
-
-            {habits.map((habit) => (
-                <div
-                    key={habit._id}
-                    style={{
-                        border: "1px solid gray",
-                        padding: "10px",
-                        marginBottom: "10px",
-                    }}
-                >
-                    <h3>{habit.title}</h3>
-                    <p>{habit.description}</p>
-                    <p>🔥 Streak: {habit.streak}</p>
-
-                    <button onClick={() => completeHabit(habit._id)}>
-                        Complete Today
-                    </button>
-
-                    <button onClick={() => deleteHabit(habit._id)}>
-                        Delete
-                    </button>
-
+                <div>
+                    {habits.map((habit, index) => (
+                        <HabitCard
+                            key={habit._id}
+                            habit={habit}
+                            completeHabit={completeHabit}
+                            deleteHabit={deleteHabit}
+                        />
+                    ))}
                 </div>
-            ))}
+
+            </div>
         </div>
     );
 };

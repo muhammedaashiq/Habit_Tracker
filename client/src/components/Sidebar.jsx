@@ -1,0 +1,47 @@
+import { Link } from "react-router-dom";
+
+
+const Sidebar = () => {
+    return (
+        <div className="w-64 h-screen bg-[#0d1117] border-r border-gray-800 p-6 flex flex-col justify-between">
+            <div>
+                <h1 className="text-3xl font-bold text-red-500 mb-10">
+                    HabitTrack
+                </h1>
+
+                <div className="space-y-4">
+                    <Link to={"/dashboard"}>
+                        <button className="w-full text-left bg-[#161b22] p-3 rounded-lg text-red-400">
+                            Dashboard
+                        </button>
+                    </Link>
+
+                    <Link to={"/allhabits"}>
+                        <button className="w-full text-left hover:bg-[#161b22] p-3 rounded-lg text-gray-300">
+                            All Habits
+                        </button>
+                    </Link>
+
+                    <Link to={"/analytics"}>
+                        <button className="w-full text-left hover:bg-[#161b22] p-3 rounded-lg text-gray-300">
+                            Analytics
+                        </button>
+                    </Link>
+
+                    <Link to={"/newHabit"}>
+                        <button className="w-full text-left hover:bg-[#161b22] p-3 rounded-lg text-gray-300">
+                            New Habit
+                        </button>
+                    </Link>
+
+                </div>
+            </div>
+
+            <button className="border border-red-500 text-red-500 p-3 rounded-lg hover:bg-red-500 hover:text-black transition">
+                Logout
+            </button>
+        </div>
+    );
+};
+
+export default Sidebar;
